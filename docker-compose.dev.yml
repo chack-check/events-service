@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  events-db:
+    image: postgres
+    env_file:
+      - .env.dev
+    networks:
+      - chack-check-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  events-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./app/:/src/app/
+    env_file:
+      - .env.dev
+    ports:
+      - 8003:8000
+    networks:
+      - chack-check-network
+
+networks:
+  chack-check-network:
+    name: chack-check-network
+    external: true
+
+volumes:
+  pgdata:

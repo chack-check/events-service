@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package protousers;
+
+message UserResponse {
+    int32 id = 1;
+    string username = 2;
+    string phone = 3;
+    string email = 4;
+    string first_name = 5;
+    string last_name = 6;
+    string middle_name = 7;
+    string activity = 8;
+    string status = 9;
+    bool email_confirmed = 10;
+    bool phone_confirmed = 11;
+    string last_seen = 12;
+}
+
+message GetUserByTokenRequest {
+    string token = 1;
+}
+
+service Users {
+    rpc GetUserByToken(GetUserByTokenRequest) returns (UserResponse) {}
+    rpc GetUserByRefreshToken(GetUserByTokenRequest) returns (UserResponse) {}
+}

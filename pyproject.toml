@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "events-service"
+version = "0.1.0"
+description = "Chack check events servic"
+authors = ["artemowkin <artyom.groshev2017@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.103.1"
+pydantic = "^2.3.0"
+websockets = "^11.0.3"
+pydantic-settings = "^2.0.3"
+uvicorn = "^0.23.2"
+grpcio = "^1.57.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
