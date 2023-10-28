@@ -34,7 +34,7 @@ spec:
                 secretKeyRef:
                   name: rabbitmq-credentials
                   key: user
-            - name: RABBIT_PASS
+            - name: RABBIT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: rabbitmq-credentials
