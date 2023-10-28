@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chack-events-service-ingress
+  labels:
+    app: chack-events-service
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/server-snippets: |
+     location /api/v1/events/ws {
+      proxysetheader Upgrade $httpupgrade;
+      proxyhttpversion 1.1;
+      proxysetheader X-Forwarded-Host $httphost;
+      proxysetheader X-Forwarded-Proto $scheme;
+      proxysetheader X-Forwarded-For $remoteaddr;
+      proxysetheader Host $host;
+      proxysetheader Connection "upgrade";
+      proxycachebypass $httpupgrade;
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+      - stage.chack-check.ru
+    secretName: letsencrypt
+  rules:
+  - host: stage.chack-check.ru
+    http:
+      paths:
+      - path: /api/v1/events
+        pathType: Prefix
+        backend:
+          service:
+            name: chack-events-service
+            port:
+              number: 8000

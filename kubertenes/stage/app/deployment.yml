@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chack-events-service-deployment
+  labels:
+    app: chack-events-service
+    name: chack-events-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chack-events-service
+  template:
+    metadata:
+      labels:
+        app: chack-events-service
+    spec:
+      containers:
+        - name: chack-events-service
+          image: artemowkin/chack-events-service:latest
+          ports:
+            - containerPort: 8000
+              name: web
+          command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+          env:
+            - name: RUN_MODE
+              value: stage
+            - name: RABBIT_HOST
+              value: rabbitmq
+            - name: RABBIT_PORT
+              value: "5672"
+            - name: RABBIT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: user
+            - name: RABBIT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: password
+            - name: USERS_SERVICE_GRPC
+              value: "users-service:9090"

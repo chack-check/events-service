@@ -1,14 +1,6 @@
 version: "3"
 
 services:
-  events-db:
-    image: postgres
-    env_file:
-      - .env.dev
-    networks:
-      - chack-check-network
-    volumes:
-      - pgdata:/var/lib/postgresql/data
   events-rabbit:
     image: rabbitmq:management
     hostname: events-rabbit
@@ -35,7 +27,6 @@ services:
     networks:
       - chack-check-network
     depends_on:
-      - events-db
       - events-rabbit
 
 networks:

@@ -20,6 +20,9 @@ msgspec = "^0.18.2"
 protobuf = "^4.24.3"
 
 
+[tool.poetry.group.lint.dependencies]
+flake8 = "^6.1.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

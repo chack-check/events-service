@@ -18,7 +18,8 @@ async def ws_endpoint(websocket: WebSocket):
         user_data = await get_user_by_refresh_token(json_data['refreshToken'])
         connection = Connection(websocket, user_data)
         ws_pool.add_connection(connection)
-        await connection.read()
+        while True:
+            await connection.read()
     except Exception:
         await websocket.close()
         raise

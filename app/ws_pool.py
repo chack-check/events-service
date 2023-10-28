@@ -1,16 +1,23 @@
+from starlette.websockets import WebSocketState
 from fastapi import WebSocket
 
 from .schemas import UserData
 
 
 class Connection:
-    
+
     def __init__(self, ws: WebSocket, user_data: UserData):
         self._ws = ws
         self._user_data = user_data
 
     async def send(self, data: dict) -> None:
-        await self._ws.send_json(data)
+        client_ok = self._ws.client_state == WebSocketState.CONNECTED
+        app_ok = self._ws.application_state == WebSocketState.CONNECTED
+        if client_ok and app_ok:
+            print(f"Sending {data} to ws (user_data: {self._user_data})")
+            await self._ws.send_json(data)
+        else:
+            print(f"Client or app is not ok: client - {client_ok}, app - {client_ok}")
 
     async def read(self) -> None:
         while True:
