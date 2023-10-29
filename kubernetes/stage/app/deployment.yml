@@ -29,6 +29,8 @@ spec:
               value: rabbitmq
             - name: RABBIT_PORT
               value: "5672"
+            - name: RABBIT_EVENTS_QUEUE_NAME
+              value: events_queue
             - name: RABBIT_USER
               valueFrom:
                 secretKeyRef:
