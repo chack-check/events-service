@@ -40,4 +40,4 @@ spec:
                   name: rabbitmq-credentials
                   key: password
             - name: USERS_SERVICE_GRPC
-              value: "users-service:9090"
+              value: "chack-users-service:9090"
