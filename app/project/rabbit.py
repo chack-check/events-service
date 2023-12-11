@@ -21,6 +21,10 @@ class Rabbit:
 
     async def on_message_received(self, message: aio_pika.IncomingMessage) -> None:
         message_json = msgspec.json.decode(message.body)
+        print(message_json)
+        if not message_json.get('includedUsers'):
+            return
+
         await ws_pool.send(message_json['includedUsers'], message_json)
         await message.ack()
 
