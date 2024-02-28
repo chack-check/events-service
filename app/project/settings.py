@@ -3,7 +3,6 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 BASE_DIR = Path(__file__).parent.parent.parent
 
 
@@ -13,7 +12,8 @@ class AppSettings(BaseSettings):
     rabbit_password: str = "guest"
     rabbit_host: str = "events-rabbit"
     rabbit_port: int = 5672
-    rabbit_events_queue_name: str = "events_queue"
+    queue_name: str = "events_queue"
+    chats_exchange_name: str = "chats_exchange"
     users_service_grpc: str = "users-service:9090"
 
     model_config = SettingsConfigDict(env_file=BASE_DIR / '.env.dev')
