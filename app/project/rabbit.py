@@ -1,21 +1,62 @@
+import asyncio
 import logging
 
 import aio_pika
-import msgspec
 
-from ..ws_pool import ConnectionsPool, ws_pool
+from app.schemas import SystemEvent
+
 from .settings import settings
 
 logger = logging.getLogger(__file__)
 
 
+class EventSubscriber:
+
+    def __init__(self, user_id: int, event_types: list[str]):
+        self.user_id = user_id
+        self.event_types = event_types
+        self._futures: list[asyncio.Future[SystemEvent]] = []
+
+    async def read(self) -> SystemEvent:
+        loop = asyncio.get_running_loop()
+        future = loop.create_future()
+        self._futures.append(future)
+        return await future
+
+    def set_event(self, event: SystemEvent):
+        for future in self._futures:
+            if future.cancelled() or future.done():
+                continue
+
+            future.set_result(event)
+
+        self._futures.clear()
+
+
+class EventsPublisher:
+
+    def __init__(self):
+        self._subscribers: list[EventSubscriber] = []
+
+    def add_subscriber(self, subscriber: EventSubscriber):
+        self._subscribers.append(subscriber)
+
+    def send(self, event: SystemEvent):
+        for subscriber in self._subscribers:
+            assert subscriber.user_id in event.included_users, (f"{subscriber.user_id=}", f"{event=}")
+            assert event.event_type in subscriber.event_types, (f"{subscriber.event_type=}", f"{event=}")
+            if subscriber.user_id in event.included_users and event.event_type in subscriber.event_types:
+                subscriber.set_event(event)
+
+
 class Rabbit:
 
-    def __init__(self, exchange_name: str, queue_name: str, ws_pool: ConnectionsPool):
+    def __init__(self, exchange_name: str, queue_name: str):
         self._connection: aio_pika.Connection | None = None
         self._exchange_name = exchange_name
         self._queue_name = queue_name
-        self._ws_pool = ws_pool
+
+        self.publisher = EventsPublisher()
 
     async def connect(self) -> None:
         credentials = f"{settings.rabbit_user}:{settings.rabbit_password}"
@@ -25,13 +66,14 @@ class Rabbit:
         )
 
     async def on_message_received(self, message: aio_pika.IncomingMessage) -> None:
-        message_json = msgspec.json.decode(message.body)
-        logger.error(message_json)
-        print(message_json)
-        if not message_json.get('includedUsers'):
+        try:
+            system_event = SystemEvent.model_validate_json(message.body)
+        except Exception as e:
+            logger.error(f"Error when decoding rabbitmq message: {e}")
             return
 
-        await ws_pool.send(message_json['includedUsers'], message_json)
+        logger.info(f"Received event {system_event} from rabbitmq")
+        self.publisher.send(system_event)
         await message.ack()
 
     async def listen(self):
@@ -51,4 +93,4 @@ class Rabbit:
                     await self.on_message_received(message)
 
 
-events_rabbit = Rabbit(settings.chats_exchange_name, settings.queue_name, ws_pool)
+events_rabbit = Rabbit(settings.chats_exchange_name, settings.queue_name)

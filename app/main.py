@@ -1,19 +1,17 @@
-import threading
 import asyncio
+import threading
 
 from fastapi import FastAPI
 
-from .project.settings import settings
-from .ws import router as ws_router
+from app.gql.router import router as gql_router
+
 from .project.rabbit import events_rabbit
 
+app = FastAPI(redoc_url=None, docs_url=None, openapi_url=None)
 
-app = FastAPI(
-    redoc_url='/api/v1/events/redoc' if settings.run_mode == 'dev' else None,
-    docs_url='/api/v1/events/docs' if settings.run_mode == 'dev' else None,
-)
+app.include_router(gql_router, prefix="/api/v1/events")
 
-app.include_router(ws_router, prefix='/api/v1/events/ws')
+# app.include_router(ws_router, prefix='/api/v1/events/ws')
 
 
 def events_target(loop: asyncio.AbstractEventLoop):

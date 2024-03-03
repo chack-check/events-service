@@ -15,6 +15,7 @@ class AppSettings(BaseSettings):
     queue_name: str = "events_queue"
     chats_exchange_name: str = "chats_exchange"
     users_service_grpc: str = "users-service:9090"
+    secret_key: str
 
     model_config = SettingsConfigDict(env_file=BASE_DIR / '.env.dev')
 

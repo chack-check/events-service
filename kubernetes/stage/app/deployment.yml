@@ -45,3 +45,8 @@ spec:
                   key: password
             - name: USERS_SERVICE_GRPC
               value: "chack-users-service:9090"
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: users-service-credentials
+                  key: secret_key
