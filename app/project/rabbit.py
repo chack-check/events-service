@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 import aio_pika
+from aio_pika.abc import AbstractConnection, AbstractIncomingMessage
 
 from app.schemas import SystemEvent
 
@@ -15,20 +16,20 @@ class EventSubscriber:
     def __init__(self, user_id: int, event_types: list[str]):
         self.user_id = user_id
         self.event_types = event_types
-        self._futures: list[asyncio.Future[SystemEvent]] = []
+        self._futures: list[asyncio.Future[list[SystemEvent]]] = []
 
-    async def read(self) -> SystemEvent:
+    async def read(self) -> list[SystemEvent]:
         loop = asyncio.get_running_loop()
         future = loop.create_future()
         self._futures.append(future)
         return await future
 
-    def set_event(self, event: SystemEvent):
+    def set_event(self, events: list[SystemEvent]):
         for future in self._futures:
             if future.cancelled() or future.done():
                 continue
 
-            future.set_result(event)
+            future.set_result(events)
 
         self._futures.clear()
 
@@ -41,18 +42,16 @@ class EventsPublisher:
     def add_subscriber(self, subscriber: EventSubscriber):
         self._subscribers.append(subscriber)
 
-    def send(self, event: SystemEvent):
+    def send(self, events: list[SystemEvent]):
         for subscriber in self._subscribers:
-            assert subscriber.user_id in event.included_users, (f"{subscriber.user_id=}", f"{event=}")
-            assert event.event_type in subscriber.event_types, (f"{subscriber.event_type=}", f"{event=}")
-            if subscriber.user_id in event.included_users and event.event_type in subscriber.event_types:
-                subscriber.set_event(event)
+            subscriber_events = [event for event in events if subscriber.user_id in event.included_users and event.event_type in subscriber.event_types]
+            subscriber.set_event(subscriber_events)
 
 
 class Rabbit:
 
     def __init__(self, exchange_name: str, queue_name: str):
-        self._connection: aio_pika.Connection | None = None
+        self._connection: AbstractConnection | None = None
         self._exchange_name = exchange_name
         self._queue_name = queue_name
 
@@ -65,16 +64,17 @@ class Rabbit:
             f"amqp://{credentials}@{host_and_port}"
         )
 
-    async def on_message_received(self, message: aio_pika.IncomingMessage) -> None:
+    async def on_messages_received(self, messages: list[AbstractIncomingMessage]) -> None:
         try:
-            system_event = SystemEvent.model_validate_json(message.body)
+            system_events = [SystemEvent.model_validate_json(message.body) for message in messages]
         except Exception as e:
             logger.error(f"Error when decoding rabbitmq message: {e}")
             return
 
-        logger.info(f"Received event {system_event} from rabbitmq")
-        self.publisher.send(system_event)
-        await message.ack()
+        logger.info(f"Received events {system_events} from rabbitmq")
+        self.publisher.send(system_events)
+        for message in messages:
+            await message.ack()
 
     async def listen(self):
         assert self._connection, "You need to run `connect()` method first"
@@ -90,7 +90,17 @@ class Rabbit:
             await queue.bind(exchange)
             async with queue.iterator() as queue_iter:
                 async for message in queue_iter:
-                    await self.on_message_received(message)
+                    if queue_iter._queue.empty():
+                        await asyncio.sleep(0.15)
+
+                    if queue_iter._queue.empty():
+                        await self.on_messages_received([message])
+                    else:
+                        received_messages = [message]
+                        while not queue_iter._queue.empty():
+                            received_messages.append(await anext(queue_iter))
+
+                        await self.on_messages_received(received_messages)
 
 
 events_rabbit = Rabbit(settings.chats_exchange_name, settings.queue_name)

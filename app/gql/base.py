@@ -21,26 +21,26 @@ class Query:
 @strawberry.type
 class Subscription:
     @strawberry.subscription
-    async def message_events(self, token: str) -> AsyncGenerator[MessageEvent, None]:
+    async def message_events(self, token: str) -> AsyncGenerator[list[MessageEvent], None]:
         user_id = get_token_user_id(token)
         subscriber = EventSubscriber(user_id, ["message_created", "message_reacted", "message_readed"])
         events_rabbit.publisher.add_subscriber(subscriber)
         while True:
             logger.info("Reading messages")
-            event = await subscriber.read()
-            logger.info(event)
-            yield MessageEventFactory.message_event_from_system_event(event)
+            events = await subscriber.read()
+            logger.info(f"Received message events: {events}")
+            yield [MessageEventFactory.message_event_from_system_event(event) for event in events]
 
     @strawberry.subscription
-    async def chat_events(self, token: str) -> AsyncGenerator[ChatEvent, None]:
+    async def chat_events(self, token: str) -> AsyncGenerator[list[ChatEvent], None]:
         user_id = get_token_user_id(token)
         subscriber = EventSubscriber(user_id, ["chat_created"])
         events_rabbit.publisher.add_subscriber(subscriber)
         while True:
             logger.info("Reading messages")
-            event = await subscriber.read()
-            logger.info(event)
-            yield ChatEventFactory.chat_event_from_system_event(event)
+            events = await subscriber.read()
+            logger.info(f"Received chats events: {events}")
+            yield [ChatEventFactory.chat_event_from_system_event(event) for event in events]
 
 
 schema = strawberry.Schema(Query, subscription=Subscription)
