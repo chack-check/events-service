@@ -81,7 +81,7 @@ class Rabbit:
         async with self._connection:
             channel = await self._connection.channel()
             await channel.set_qos(prefetch_count=10)
-            queue = await channel.declare_queue(self._queue_name, durable=True)
+            queue = await channel.declare_queue(self._queue_name, durable=False)
             exchange = await channel.declare_exchange(
                 self._exchange_name,
                 aio_pika.ExchangeType.FANOUT,
