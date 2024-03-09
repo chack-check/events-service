@@ -44,15 +44,15 @@ class EventsPublisher:
 
     def send(self, events: list[SystemEvent]):
         for subscriber in self._subscribers:
-            subscriber_events = [event for event in events if subscriber.user_id in event.included_users and event.event_type in subscriber.event_types]
+            subscriber_events = [event for event in events if (not event.included_users or subscriber.user_id in event.included_users) and event.event_type in subscriber.event_types]
             subscriber.set_event(subscriber_events)
 
 
 class Rabbit:
 
-    def __init__(self, exchange_name: str, queue_name: str):
+    def __init__(self, exchange_names: list[str], queue_name: str):
         self._connection: AbstractConnection | None = None
-        self._exchange_name = exchange_name
+        self._exchange_names = exchange_names
         self._queue_name = queue_name
 
         self.publisher = EventsPublisher()
@@ -82,12 +82,14 @@ class Rabbit:
             channel = await self._connection.channel()
             await channel.set_qos(prefetch_count=10)
             queue = await channel.declare_queue(self._queue_name, durable=False)
-            exchange = await channel.declare_exchange(
-                self._exchange_name,
-                aio_pika.ExchangeType.FANOUT,
-                durable=True,
-            )
-            await queue.bind(exchange)
+            for exchange_name in self._exchange_names:
+                exchange = await channel.declare_exchange(
+                    exchange_name,
+                    aio_pika.ExchangeType.FANOUT,
+                    durable=True,
+                )
+                await queue.bind(exchange)
+
             async with queue.iterator() as queue_iter:
                 async for message in queue_iter:
                     if queue_iter._queue.empty():
@@ -103,4 +105,4 @@ class Rabbit:
                         await self.on_messages_received(received_messages)
 
 
-events_rabbit = Rabbit(settings.chats_exchange_name, settings.queue_name)
+events_rabbit = Rabbit([settings.chats_exchange_name, settings.users_exchange_name], settings.queue_name)

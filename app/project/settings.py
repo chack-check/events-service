@@ -14,6 +14,7 @@ class AppSettings(BaseSettings):
     rabbit_port: int = 5672
     queue_name: str = "events_queue"
     chats_exchange_name: str = "chats_exchange"
+    users_exchange_name: str = "users_exchange"
     users_service_grpc: str = "users-service:9090"
     secret_key: str
 

@@ -9,8 +9,56 @@ from app.gql.types import (
     MessageEventTypesEnum,
     MessageTypesEnum,
     Reaction,
+    User,
+    UserAvatar,
+    UserEvent,
+    UserEventTypesEnum,
 )
-from app.schemas import ChatData, MessageData, ReactionData, SystemEvent
+from app.schemas import (
+    ChatData,
+    MessageData,
+    ReactionData,
+    SystemEvent,
+    UserAvatarData,
+    UserEventData,
+)
+
+
+class UserEventFactory:
+    @classmethod
+    def user_avatar_from_system_event_data(cls, data: UserAvatarData) -> UserAvatar:
+        return UserAvatar(
+            original_url=data["original_url"],
+            original_filename=data["original_filename"],
+            converted_url=data["converted_url"],
+            converted_filename=data["converted_filename"],
+        )
+
+    @classmethod
+    def user_from_system_event_data(cls, data: UserEventData) -> User:
+        return User(
+            id=data["id"],
+            username=data["username"],
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            email_confirmed=data["email_confirmed"],
+            phone_confirmed=data["phone_confirmed"],
+            last_seen=data["last_seen"],
+            status=data["status"],
+            middle_name=data["middle_name"],
+            phone=data["phone"],
+            email=data["email"],
+            avatar=cls.user_avatar_from_system_event_data(data["avatar"]),
+        )
+
+    @classmethod
+    def user_event_from_system_event(cls, event: SystemEvent) -> UserEvent:
+        system_event_data = msgspec.json.decode(event.data)
+        return UserEvent(
+            included_users=event.included_users,
+            event_type=UserEventTypesEnum(event.event_type),
+            user=cls.user_from_system_event_data(system_event_data),
+        )
 
 
 class MessageEventFactory:

@@ -33,6 +33,8 @@ spec:
               value: events_queue
             - name: CHATS_EXCHANGE_NAME
               value: chats_exchange
+            - name: USERS_EXCHANGE_NAME
+              value: users_exchange
             - name: RABBIT_USER
               valueFrom:
                 secretKeyRef:
