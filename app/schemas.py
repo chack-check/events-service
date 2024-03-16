@@ -14,7 +14,7 @@ class SystemEvent(BaseModel):
     data: str
 
 
-class UserAvatarData(TypedDict):
+class SavedFileData(TypedDict):
     original_url: str
     original_filename: str
     converted_url: str | None
@@ -28,7 +28,7 @@ class UserEventData(TypedDict):
     last_name: str
     email_confirmed: bool
     phone_confirmed: bool
-    avatar: UserAvatarData
+    avatar: SavedFileData
     last_seen: datetime | None
     status: str | None
     middle_name: str | None
@@ -49,9 +49,9 @@ class MessageData(TypedDict):
     sender_id: int
     type: str
     content: str
-    voice_url: str
-    circle_url: str
-    attachments: list[str]
+    voice: SavedFileData
+    circle: SavedFileData
+    attachments: list[SavedFileData]
     reply_to_id: int
     mentioned: list[int]
     readed_by: list[int]
@@ -61,7 +61,7 @@ class MessageData(TypedDict):
 
 class ChatData(TypedDict):
     id: int
-    avatar_url: str
+    avatar: SavedFileData
     title: str
     type: str
     members: list[int]

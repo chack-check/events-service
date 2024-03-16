@@ -9,8 +9,8 @@ from app.gql.types import (
     MessageEventTypesEnum,
     MessageTypesEnum,
     Reaction,
+    SavedFile,
     User,
-    UserAvatar,
     UserEvent,
     UserEventTypesEnum,
 )
@@ -18,22 +18,24 @@ from app.schemas import (
     ChatData,
     MessageData,
     ReactionData,
+    SavedFileData,
     SystemEvent,
-    UserAvatarData,
     UserEventData,
 )
 
 
-class UserEventFactory:
+class SavedFileFactory:
     @classmethod
-    def user_avatar_from_system_event_data(cls, data: UserAvatarData) -> UserAvatar:
-        return UserAvatar(
+    def saved_file_from_system_event_data(cls, data: SavedFileData) -> SavedFile:
+        return SavedFile(
             original_url=data["original_url"],
             original_filename=data["original_filename"],
             converted_url=data["converted_url"],
             converted_filename=data["converted_filename"],
         )
 
+
+class UserEventFactory:
     @classmethod
     def user_from_system_event_data(cls, data: UserEventData) -> User:
         return User(
@@ -48,7 +50,7 @@ class UserEventFactory:
             middle_name=data["middle_name"],
             phone=data["phone"],
             email=data["email"],
-            avatar=cls.user_avatar_from_system_event_data(data["avatar"]),
+            avatar=SavedFileFactory.saved_file_from_system_event_data(data["avatar"]),
         )
 
     @classmethod
@@ -72,15 +74,16 @@ class MessageEventFactory:
 
     @classmethod
     def message_from_system_event_data(cls, system_event_data: MessageData) -> Message:
+        attachments = [SavedFileFactory.saved_file_from_system_event_data(attachment) for attachment in system_event_data["attachments"]] if system_event_data["attachments"] else []
         return Message(
             id=system_event_data["id"],
             chat_id=system_event_data["chat_id"],
             sender_id=system_event_data["sender_id"],
             type=MessageTypesEnum(system_event_data["type"]),
             content=system_event_data["content"],
-            voice_url=system_event_data["voice_url"],
-            circle_url=system_event_data["circle_url"],
-            attachments=system_event_data["attachments"],
+            voice=SavedFileFactory.saved_file_from_system_event_data(system_event_data["voice"]),
+            circle=SavedFileFactory.saved_file_from_system_event_data(system_event_data["circle"]),
+            attachments=attachments,
             reply_to_id=system_event_data["reply_to_id"],
             mentioned=system_event_data["mentioned"] or [],
             readed_by=system_event_data["readed_by"] or [],
@@ -103,7 +106,7 @@ class ChatEventFactory:
     def chat_from_system_event_data(cls, system_event_data: ChatData) -> Chat:
         return Chat(
             id=system_event_data["id"],
-            avatar_url=system_event_data["avatar_url"],
+            avatar=SavedFileFactory.saved_file_from_system_event_data(system_event_data["avatar"]),
             title=system_event_data["title"],
             type=system_event_data["type"],
             members=system_event_data["members"] or [],

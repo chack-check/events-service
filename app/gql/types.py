@@ -4,6 +4,14 @@ from enum import Enum
 import strawberry
 
 
+@strawberry.type
+class SavedFile:
+    original_url: str
+    original_filename: str
+    converted_url: str | None = None
+    converted_filename: str | None = None
+
+
 @strawberry.enum
 class MessageTypesEnum(Enum):
     text = "text"
@@ -49,9 +57,9 @@ class Message:
     sender_id: int
     type: MessageTypesEnum
     content: str
-    voice_url: str
-    circle_url: str
-    attachments: list[str]
+    voice: SavedFile
+    circle: SavedFile
+    attachments: list[SavedFile]
     reply_to_id: int
     mentioned: list[int]
     readed_by: list[int]
@@ -62,21 +70,13 @@ class Message:
 @strawberry.type
 class Chat:
     id: int
-    avatar_url: str
+    avatar: SavedFile
     title: str
     type: str
     members: list[int]
     is_archived: bool
     owner_id: int
     admins: list[int]
-
-
-@strawberry.type
-class UserAvatar:
-    original_url: str
-    original_filename: str
-    converted_url: str | None = None
-    converted_filename: str | None = None
 
 
 @strawberry.type
@@ -87,7 +87,7 @@ class User:
     last_name: str
     email_confirmed: bool
     phone_confirmed: bool
-    avatar: UserAvatar
+    avatar: SavedFile
     last_seen: datetime | None
     status: str | None = None
     middle_name: str | None = None
