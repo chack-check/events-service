@@ -59,6 +59,16 @@ class MessageData(TypedDict):
     reactions: list[ReactionData]
 
 
+class ChatActionUserData(TypedDict):
+    name: str
+    id: int
+
+
+class ChatActionData(TypedDict):
+    action: str
+    action_users: list[ChatActionUserData]
+
+
 class ChatData(TypedDict):
     id: int
     avatar: SavedFileData
@@ -68,4 +78,5 @@ class ChatData(TypedDict):
     is_archived: bool
     owner_id: int
     admins: list[int]
+    actions: list[ChatActionData]
     CreatedAt: datetime

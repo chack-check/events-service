@@ -13,6 +13,16 @@ class SavedFile:
 
 
 @strawberry.enum
+class ActionTypes(Enum):
+    writing = "writing"
+    audio_recording = "audio_recording"
+    audio_sending = "audio_sending"
+    circle_recording = "circle_recording"
+    circle_sending = "circle_sending"
+    files_sending = "files_sending"
+
+
+@strawberry.enum
 class MessageTypesEnum(Enum):
     text = "text"
     event = "event"
@@ -35,6 +45,7 @@ class MessageEventTypesEnum(Enum):
 class ChatEventTypesEnum(Enum):
     chat_created = "chat_created"
     chat_deleted = "chat_deleted"
+    chat_user_action = "chat_user_action"
 
 
 @strawberry.enum
@@ -68,6 +79,18 @@ class Message:
 
 
 @strawberry.type
+class ChatActionUser:
+    name: str
+    id: int
+
+
+@strawberry.type
+class ChatAction:
+    action: ActionTypes
+    action_users: list[ChatActionUser]
+
+
+@strawberry.type
 class Chat:
     id: int
     avatar: SavedFile
@@ -77,6 +100,7 @@ class Chat:
     is_archived: bool
     owner_id: int
     admins: list[int]
+    actions: list[ChatAction] = strawberry.field(default_factory=list)
 
 
 @strawberry.type

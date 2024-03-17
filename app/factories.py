@@ -1,7 +1,10 @@
 import msgspec
 
 from app.gql.types import (
+    ActionTypes,
     Chat,
+    ChatAction,
+    ChatActionUser,
     ChatEvent,
     ChatEventTypesEnum,
     Message,
@@ -15,6 +18,7 @@ from app.gql.types import (
     UserEventTypesEnum,
 )
 from app.schemas import (
+    ChatActionData,
     ChatData,
     MessageData,
     ReactionData,
@@ -101,6 +105,20 @@ class MessageEventFactory:
         )
 
 
+class ChatActionsFactory:
+    @classmethod
+    def chat_actions_from_system_event_data(cls, data: list[ChatActionData]) -> list[ChatAction]:
+        chat_actions = []
+        for action in data:
+            chat_action_users = []
+            for user in action["action_users"]:
+                chat_action_users.append(ChatActionUser(name=user["name"], id=user["id"]))
+
+            chat_actions.append(ChatAction(action=ActionTypes(action["action"]), action_users=chat_action_users))
+
+        return chat_actions
+
+
 class ChatEventFactory:
     @classmethod
     def chat_from_system_event_data(cls, system_event_data: ChatData) -> Chat:
@@ -113,6 +131,7 @@ class ChatEventFactory:
             is_archived=system_event_data["is_archived"],
             owner_id=system_event_data["owner_id"],
             admins=system_event_data["admins"] or [],
+            actions=ChatActionsFactory.chat_actions_from_system_event_data(system_event_data["actions"]) if system_event_data["actions"] else [],
         )
 
     @classmethod

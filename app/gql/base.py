@@ -41,7 +41,7 @@ class Subscription:
     @strawberry.subscription
     async def chat_events(self, token: str) -> AsyncGenerator[list[ChatEvent], None]:
         user_id = get_token_user_id(token)
-        subscriber = EventSubscriber(user_id, ["chat_created", "chat_deleted"])
+        subscriber = EventSubscriber(user_id, ["chat_created", "chat_deleted", "chat_user_action"])
         events_rabbit.publisher.add_subscriber(subscriber)
         while True:
             logger.info("Reading messages")
