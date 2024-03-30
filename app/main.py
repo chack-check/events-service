@@ -1,11 +1,20 @@
 import asyncio
+import logging
 import threading
 
+import sentry_sdk
 from fastapi import FastAPI
 
 from app.gql.router import router as gql_router
+from app.project.settings import settings
 
 from .project.rabbit import events_rabbit
+
+logger = logging.getLogger("uvicorn.error")
+
+logger.debug(f"Initializing sentry with dsn: {settings.sentry_dsn}")
+if settings.sentry_dsn:
+    sentry_sdk.init(settings.sentry_dsn)
 
 app = FastAPI(redoc_url=None, docs_url=None, openapi_url=None)
 

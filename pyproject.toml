@@ -20,6 +20,7 @@ msgspec = "^0.18.2"
 protobuf = "^4.24.3"
 strawberry-graphql = "^0.219.2"
 python-jose = "^3.3.0"
+sentry-sdk = {extras = ["fastapi"], version = "^1.44.0"}
 
 
 [tool.poetry.group.lint.dependencies]

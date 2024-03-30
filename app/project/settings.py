@@ -17,6 +17,7 @@ class AppSettings(BaseSettings):
     users_exchange_name: str = "users_exchange"
     users_service_grpc: str = "users-service:9090"
     secret_key: str
+    sentry_dsn: str | None = None
 
     model_config = SettingsConfigDict(env_file=BASE_DIR / '.env.dev')
 
