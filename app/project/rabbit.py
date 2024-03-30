@@ -3,6 +3,7 @@ import logging
 
 import aio_pika
 from aio_pika.abc import AbstractConnection, AbstractIncomingMessage
+from pydantic import ValidationError
 
 from app.schemas import SystemEvent
 
@@ -65,13 +66,18 @@ class Rabbit:
         )
 
     async def on_messages_received(self, messages: list[AbstractIncomingMessage]) -> None:
-        try:
-            system_events = [SystemEvent.model_validate_json(message.body) for message in messages]
-        except Exception as e:
-            logger.error(f"Error when decoding rabbitmq message: {e}")
-            return
+        system_events: list[SystemEvent] = []
+        for message in messages:
+            try:
+                SystemEvent.model_validate_json(message.body)
+            except ValidationError:
+                logger.error(f"Error when decoding message from rabbitmq: {messages=}")
+                continue
 
         logger.info(f"Received events {system_events} from rabbitmq")
+        if not system_events:
+            return
+
         self.publisher.send(system_events)
         for message in messages:
             await message.ack()
