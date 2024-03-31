@@ -1,0 +1,20 @@
+name: CI/CD Stage
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  staging:
+    uses: chack-check/diffaction-workflows/.github/workflows/python-staging.yml@main
+    with:
+      service-name: diffaction-events-service
+      app-manifests: |
+        kubernetes/stage/app/deployment.yml
+        kubernetes/stage/app/service.yml
+        kubernetes/stage/app/ingress.yml
+      skiptests: true
+    secrets:
+      KUBERNETES_SECRET: ${{ secrets.KUBERNETES_SECRET }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
