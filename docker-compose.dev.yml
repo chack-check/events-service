@@ -1,18 +1,22 @@
 version: "3"
 
 services:
-  events-db:
-    image: postgres
+  events-rabbit:
+    image: rabbitmq:management
+    hostname: events-rabbit
+    restart: always
+    ports:
+      - 15672:15672
+      - 5672:5672
     env_file:
       - .env.dev
     networks:
       - chack-check-network
-    volumes:
-      - pgdata:/var/lib/postgresql/data
   events-service:
     build:
       context: .
       dockerfile: docker/Dockerfile.dev
+    restart: always
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     volumes:
       - ./app/:/src/app/
@@ -22,6 +26,8 @@ services:
       - 8003:8000
     networks:
       - chack-check-network
+    depends_on:
+      - events-rabbit
 
 networks:
   chack-check-network:
