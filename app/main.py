@@ -20,8 +20,6 @@ app = FastAPI(redoc_url=None, docs_url=None, openapi_url=None)
 
 app.include_router(gql_router, prefix="/api/v1/events")
 
-# app.include_router(ws_router, prefix='/api/v1/events/ws')
-
 
 def events_target(loop: asyncio.AbstractEventLoop):
     asyncio.ensure_future(events_rabbit.listen(), loop=loop)

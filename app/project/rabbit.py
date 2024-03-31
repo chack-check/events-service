@@ -9,7 +9,7 @@ from app.schemas import SystemEvent
 
 from .settings import settings
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger("uvicorn.error")
 
 
 class EventSubscriber:
