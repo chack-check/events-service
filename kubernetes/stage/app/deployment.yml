@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: chack-events-service
-          image: artemowkin/chack-events-service:latest
+          image: artemowkin/diffaction-events-service:latest
           ports:
             - containerPort: 8000
               name: web
