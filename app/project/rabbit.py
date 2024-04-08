@@ -45,7 +45,12 @@ class EventsPublisher:
 
     def send(self, events: list[SystemEvent]):
         for subscriber in self._subscribers:
-            subscriber_events = [event for event in events if (not event.included_users or subscriber.user_id in event.included_users) and event.event_type in subscriber.event_types]
+            subscriber_events = [
+                event
+                for event in events
+                if (not event.included_users or subscriber.user_id in event.included_users)
+                and event.event_type in subscriber.event_types
+            ]
             subscriber.set_event(subscriber_events)
 
 
@@ -61,15 +66,15 @@ class Rabbit:
     async def connect(self) -> None:
         credentials = f"{settings.rabbit_user}:{settings.rabbit_password}"
         host_and_port = f"{settings.rabbit_host}:{settings.rabbit_port}"
-        self._connection = await aio_pika.connect_robust(
-            f"amqp://{credentials}@{host_and_port}"
-        )
+        self._connection = await aio_pika.connect_robust(f"amqp://{credentials}@{host_and_port}")
 
     async def on_messages_received(self, messages: list[AbstractIncomingMessage]) -> None:
         system_events: list[SystemEvent] = []
         for message in messages:
             try:
-                SystemEvent.model_validate_json(message.body)
+                system_event = SystemEvent.model_validate_json(message.body)
+                logger.info(f"Received rabbitmq system event: {system_event}")
+                system_events.append(system_event)
             except ValidationError:
                 logger.error(f"Error when decoding message from rabbitmq: {messages=}")
                 continue
