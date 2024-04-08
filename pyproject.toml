@@ -24,8 +24,11 @@ sentry-sdk = {extras = ["fastapi"], version = "^1.44.0"}
 
 
 [tool.poetry.group.lint.dependencies]
-flake8 = "^6.1.0"
+pyright = "^1.1.357"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+exclude = ["**/protousers"]

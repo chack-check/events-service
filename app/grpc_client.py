@@ -3,7 +3,12 @@ import logging
 from grpc.aio import insecure_channel
 
 from .project.settings import settings
-from .protousers.users_pb2 import GetUserByTokenRequest, UserResponse
+from .protousers.users_pb2 import (
+    GetUserByTokenRequest,  # pyright: ignore[reportAttributeAccessIssue]
+)
+from .protousers.users_pb2 import (
+    UserResponse,  # pyright: ignore[reportAttributeAccessIssue]
+)
 from .protousers.users_pb2_grpc import UsersStub
 
 logger = logging.getLogger("uvicorn.error")

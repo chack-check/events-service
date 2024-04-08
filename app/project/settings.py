@@ -19,7 +19,7 @@ class AppSettings(BaseSettings):
     secret_key: str
     sentry_dsn: str | None = None
 
-    model_config = SettingsConfigDict(env_file=BASE_DIR / '.env.dev')
+    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env.dev")
 
 
-settings = AppSettings()
+settings = AppSettings()  # pyright: ignore[reportCallIssue]
