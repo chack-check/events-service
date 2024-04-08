@@ -16,17 +16,17 @@ def get_token_user_id(token: str) -> int:
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
         logger.debug(f"Token payload: {payload}")
-        if not payload['exp'] > datetime.datetime.now(datetime.UTC).timestamp():
+        if not payload["exp"] > datetime.datetime.now(datetime.timezone.utc).timestamp():
             logger.warning(f"Token expired: {payload['exp']}")
             raise ValueError("Incorrect token")
 
-        decoded_sub = json.loads(payload['sub'])
+        decoded_sub = json.loads(payload["sub"])
         logger.debug(f"Decoded token sub: {decoded_sub}")
         if "user_id" not in decoded_sub:
             logger.warning("There is no user id in token sub")
             raise ValueError("Incorrect token")
 
-        return decoded_sub['user_id']
+        return decoded_sub["user_id"]
     except (KeyError, JWTError) as e:
         logger.exception(e)
         raise ValueError("Incorrect token")
