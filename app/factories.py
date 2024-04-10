@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import msgspec
 
 from app.gql.types import (
@@ -49,7 +51,7 @@ class UserEventFactory:
             last_name=data["last_name"],
             email_confirmed=data["email_confirmed"],
             phone_confirmed=data["phone_confirmed"],
-            last_seen=data["last_seen"],
+            last_seen=datetime.fromisoformat(data["last_seen"]) if data["last_seen"] else None,
             status=data["status"],
             middle_name=data["middle_name"],
             phone=data["phone"],
@@ -78,7 +80,14 @@ class MessageEventFactory:
 
     @classmethod
     def message_from_system_event_data(cls, system_event_data: MessageData) -> Message:
-        attachments = [SavedFileFactory.saved_file_from_system_event_data(attachment) for attachment in system_event_data["attachments"]] if system_event_data["attachments"] else []
+        attachments = (
+            [
+                SavedFileFactory.saved_file_from_system_event_data(attachment)
+                for attachment in system_event_data["attachments"]
+            ]
+            if system_event_data["attachments"]
+            else []
+        )
         return Message(
             id=system_event_data["id"],
             chat_id=system_event_data["chat_id"],
@@ -91,8 +100,12 @@ class MessageEventFactory:
             reply_to_id=system_event_data["reply_to_id"],
             mentioned=system_event_data["mentioned"] or [],
             readed_by=system_event_data["readed_by"] or [],
-            reactions=[cls.reaction_from_event_data(reaction) for reaction in system_event_data["reactions"]] if system_event_data["reactions"] else [],
-            datetime=system_event_data["CreatedAt"],
+            reactions=(
+                [cls.reaction_from_event_data(reaction) for reaction in system_event_data["reactions"]]
+                if system_event_data["reactions"]
+                else []
+            ),
+            datetime=datetime.fromisoformat(system_event_data["CreatedAt"]),
         )
 
     @classmethod
@@ -131,7 +144,11 @@ class ChatEventFactory:
             is_archived=system_event_data["is_archived"],
             owner_id=system_event_data["owner_id"],
             admins=system_event_data["admins"] or [],
-            actions=ChatActionsFactory.chat_actions_from_system_event_data(system_event_data["actions"]) if system_event_data["actions"] else [],
+            actions=(
+                ChatActionsFactory.chat_actions_from_system_event_data(system_event_data["actions"])
+                if system_event_data["actions"]
+                else []
+            ),
         )
 
     @classmethod
