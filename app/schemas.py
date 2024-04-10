@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import TypedDict
 
 from pydantic import BaseModel
@@ -29,7 +28,7 @@ class UserEventData(TypedDict):
     email_confirmed: bool
     phone_confirmed: bool
     avatar: SavedFileData
-    last_seen: datetime | None
+    last_seen: str | None
     status: str | None
     middle_name: str | None
     phone: str | None
@@ -40,7 +39,7 @@ class ReactionData(TypedDict):
     id: int
     user_id: int
     content: str
-    CreatedAt: datetime
+    CreatedAt: str
 
 
 class MessageData(TypedDict):
@@ -55,7 +54,7 @@ class MessageData(TypedDict):
     reply_to_id: int
     mentioned: list[int]
     readed_by: list[int]
-    CreatedAt: datetime
+    CreatedAt: str
     reactions: list[ReactionData]
 
 
@@ -79,4 +78,4 @@ class ChatData(TypedDict):
     owner_id: int
     admins: list[int]
     actions: list[ChatActionData]
-    CreatedAt: datetime
+    CreatedAt: str
