@@ -67,15 +67,15 @@ class Message:
     chat_id: int
     sender_id: int
     type: MessageTypesEnum
-    content: str
-    voice: SavedFile
-    circle: SavedFile
+    content: str | None
+    voice: SavedFile | None
+    circle: SavedFile | None
     attachments: list[SavedFile]
-    reply_to_id: int
+    reply_to_id: int | None
     mentioned: list[int]
     readed_by: list[int]
     reactions: list[Reaction]
-    datetime: datetime
+    created_at: datetime | None
 
 
 @strawberry.type
@@ -93,7 +93,7 @@ class ChatAction:
 @strawberry.type
 class Chat:
     id: int
-    avatar: SavedFile
+    avatar: SavedFile | None
     title: str
     type: str
     members: list[int]
@@ -111,7 +111,7 @@ class User:
     last_name: str
     email_confirmed: bool
     phone_confirmed: bool
-    avatar: SavedFile
+    avatar: SavedFile | None
     last_seen: datetime | None
     status: str | None = None
     middle_name: str | None = None
