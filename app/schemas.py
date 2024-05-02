@@ -27,7 +27,7 @@ class UserEventData(TypedDict):
     last_name: str
     email_confirmed: bool
     phone_confirmed: bool
-    avatar: SavedFileData
+    avatar: SavedFileData | None
     last_seen: str | None
     status: str | None
     middle_name: str | None
@@ -44,17 +44,17 @@ class ReactionData(TypedDict):
 
 class MessageData(TypedDict):
     id: int
-    chat_id: int
-    sender_id: int
+    chatId: int
+    senderId: int
     type: str
-    content: str
-    voice: SavedFileData
-    circle: SavedFileData
+    content: str | None
+    voice: SavedFileData | None
+    circle: SavedFileData | None
     attachments: list[SavedFileData]
-    reply_to_id: int
+    replyToId: int | None
     mentioned: list[int]
-    readed_by: list[int]
-    CreatedAt: str
+    readedBy: list[int]
+    createdAt: str | None
     reactions: list[ReactionData]
 
 
@@ -70,12 +70,11 @@ class ChatActionData(TypedDict):
 
 class ChatData(TypedDict):
     id: int
-    avatar: SavedFileData
+    avatar: SavedFileData | None
     title: str
     type: str
     members: list[int]
-    is_archived: bool
-    owner_id: int
+    isArchived: bool
+    ownerId: int
     admins: list[int]
     actions: list[ChatActionData]
-    CreatedAt: str

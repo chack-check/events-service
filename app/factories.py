@@ -56,7 +56,7 @@ class UserEventFactory:
             middle_name=data["middle_name"],
             phone=data["phone"],
             email=data["email"],
-            avatar=SavedFileFactory.saved_file_from_system_event_data(data["avatar"]),
+            avatar=SavedFileFactory.saved_file_from_system_event_data(data["avatar"]) if data["avatar"] else None,
         )
 
     @classmethod
@@ -90,22 +90,32 @@ class MessageEventFactory:
         )
         return Message(
             id=system_event_data["id"],
-            chat_id=system_event_data["chat_id"],
-            sender_id=system_event_data["sender_id"],
+            chat_id=system_event_data["chatId"],
+            sender_id=system_event_data["senderId"],
             type=MessageTypesEnum(system_event_data["type"]),
             content=system_event_data["content"],
-            voice=SavedFileFactory.saved_file_from_system_event_data(system_event_data["voice"]),
-            circle=SavedFileFactory.saved_file_from_system_event_data(system_event_data["circle"]),
+            voice=(
+                SavedFileFactory.saved_file_from_system_event_data(system_event_data["voice"])
+                if system_event_data["voice"]
+                else None
+            ),
+            circle=(
+                SavedFileFactory.saved_file_from_system_event_data(system_event_data["circle"])
+                if system_event_data["circle"]
+                else None
+            ),
             attachments=attachments,
-            reply_to_id=system_event_data["reply_to_id"],
+            reply_to_id=system_event_data["replyToId"],
             mentioned=system_event_data["mentioned"] or [],
-            readed_by=system_event_data["readed_by"] or [],
+            readed_by=system_event_data["readedBy"] or [],
             reactions=(
                 [cls.reaction_from_event_data(reaction) for reaction in system_event_data["reactions"]]
                 if system_event_data["reactions"]
                 else []
             ),
-            datetime=datetime.fromisoformat(system_event_data["CreatedAt"]),
+            created_at=(
+                datetime.fromisoformat(system_event_data["createdAt"]) if system_event_data["createdAt"] else None
+            ),
         )
 
     @classmethod
@@ -137,12 +147,16 @@ class ChatEventFactory:
     def chat_from_system_event_data(cls, system_event_data: ChatData) -> Chat:
         return Chat(
             id=system_event_data["id"],
-            avatar=SavedFileFactory.saved_file_from_system_event_data(system_event_data["avatar"]),
+            avatar=(
+                SavedFileFactory.saved_file_from_system_event_data(system_event_data["avatar"])
+                if system_event_data["avatar"]
+                else None
+            ),
             title=system_event_data["title"],
             type=system_event_data["type"],
             members=system_event_data["members"] or [],
-            is_archived=system_event_data["is_archived"],
-            owner_id=system_event_data["owner_id"],
+            is_archived=system_event_data["isArchived"],
+            owner_id=system_event_data["ownerId"],
             admins=system_event_data["admins"] or [],
             actions=(
                 ChatActionsFactory.chat_actions_from_system_event_data(system_event_data["actions"])
