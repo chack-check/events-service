@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chack-events-service-deployment
+  name: diffaction-events-service-deployment
   labels:
-    app: chack-events-service
-    name: chack-events-service
+    app: diffaction-events-service
+    name: diffaction-events-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chack-events-service
+      app: diffaction-events-service
   template:
     metadata:
       labels:
-        app: chack-events-service
+        app: diffaction-events-service
     spec:
       containers:
-        - name: chack-events-service
+        - name: diffaction-events-service
           image: artemowkin/diffaction-events-service:latest
           ports:
             - containerPort: 8000
