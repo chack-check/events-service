@@ -17,7 +17,6 @@ jobs:
       run-tests-command: poetry run pytest
     secrets:
       KUBERNETES_SECRET: ${{ secrets.KUBERNETES_SECRET }}
-      KUBERNETES_URL: ${{ secrets.KUBERNETES_URL }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       CLIENT_SERVICE_PAT: ${{ secrets.CLIENT_SERVICE_PAT }}
