@@ -64,9 +64,7 @@ class Rabbit:
         self.publisher = EventsPublisher()
 
     async def connect(self) -> None:
-        credentials = f"{settings.rabbit_user}:{settings.rabbit_password}"
-        host_and_port = f"{settings.rabbit_host}:{settings.rabbit_port}"
-        self._connection = await aio_pika.connect_robust(f"amqp://{credentials}@{host_and_port}")
+        self._connection = await aio_pika.connect_robust(settings.rabbit_host)
 
     async def on_messages_received(self, messages: list[AbstractIncomingMessage]) -> None:
         system_events: list[SystemEvent] = []
