@@ -26,25 +26,16 @@ spec:
             - name: RUN_MODE
               value: stage
             - name: RABBIT_HOST
-              value: rabbitmq
-            - name: RABBIT_PORT
-              value: "5672"
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: url
             - name: QUEUE_NAME
               value: events_queue
             - name: CHATS_EXCHANGE_NAME
               value: chats_exchange
             - name: USERS_EXCHANGE_NAME
               value: users_exchange
-            - name: RABBIT_USER
-              valueFrom:
-                secretKeyRef:
-                  name: rabbitmq-credentials
-                  key: user
-            - name: RABBIT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: rabbitmq-credentials
-                  key: password
             - name: USERS_SERVICE_GRPC
               value: "chack-users-service:9090"
             - name: SECRET_KEY
