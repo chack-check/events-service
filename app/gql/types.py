@@ -46,6 +46,7 @@ class ChatEventTypesEnum(Enum):
     chat_created = "chat_created"
     chat_deleted = "chat_deleted"
     chat_user_action = "chat_user_action"
+    chat_changed = "chat_changed"
 
 
 @strawberry.enum
