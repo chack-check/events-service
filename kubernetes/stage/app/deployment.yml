@@ -31,13 +31,11 @@ spec:
                   name: rabbitmq-credentials
                   key: url
             - name: QUEUE_NAME
-              value: events_queue
+              value: stage_events_queue
             - name: CHATS_EXCHANGE_NAME
-              value: chats_exchange
+              value: stage_chats_exchange
             - name: USERS_EXCHANGE_NAME
-              value: users_exchange
-            - name: USERS_SERVICE_GRPC
-              value: "chack-users-service:9090"
+              value: stage_users_exchange
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
