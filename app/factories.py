@@ -34,10 +34,10 @@ class SavedFileFactory:
     @classmethod
     def saved_file_from_system_event_data(cls, data: SavedFileData) -> SavedFile:
         return SavedFile(
-            original_url=data["original_url"],
-            original_filename=data["original_filename"],
-            converted_url=data["converted_url"],
-            converted_filename=data["converted_filename"],
+            original_url=data["originalUrl"],
+            original_filename=data["originalFilename"],
+            converted_url=data["convertedUrl"],
+            converted_filename=data["convertedFilename"],
         )
 
 

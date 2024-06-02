@@ -14,10 +14,10 @@ class SystemEvent(BaseModel):
 
 
 class SavedFileData(TypedDict):
-    original_url: str
-    original_filename: str
-    converted_url: str | None
-    converted_filename: str | None
+    originalUrl: str
+    originalFilename: str
+    convertedUrl: str | None
+    convertedFilename: str | None
 
 
 class UserEventData(TypedDict):
