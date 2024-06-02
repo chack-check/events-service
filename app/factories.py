@@ -134,7 +134,7 @@ class ChatActionsFactory:
         chat_actions = []
         for action in data:
             chat_action_users = []
-            for user in action["actionUsers"]:
+            for user in action["action_users"]:
                 chat_action_users.append(ChatActionUser(name=user["name"], id=user["id"]))
 
             chat_actions.append(ChatAction(action=ActionTypes(action["action"]), action_users=chat_action_users))
