@@ -34,10 +34,10 @@ class SavedFileFactory:
     @classmethod
     def saved_file_from_system_event_data(cls, data: SavedFileData) -> SavedFile:
         return SavedFile(
-            original_url=data["original_url"],
-            original_filename=data["original_filename"],
-            converted_url=data["converted_url"],
-            converted_filename=data["converted_filename"],
+            original_url=data["originalUrl"],
+            original_filename=data["originalFilename"],
+            converted_url=data["convertedUrl"],
+            converted_filename=data["convertedFilename"],
         )
 
 
@@ -134,7 +134,7 @@ class ChatActionsFactory:
         chat_actions = []
         for action in data:
             chat_action_users = []
-            for user in action["action_users"]:
+            for user in action["actionUsers"]:
                 chat_action_users.append(ChatActionUser(name=user["name"], id=user["id"]))
 
             chat_actions.append(ChatAction(action=ActionTypes(action["action"]), action_users=chat_action_users))
